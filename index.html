@@ -57,19 +57,17 @@
 
   <script>
     function fetchScore() {
-      fetch('/api/score')
-        .then(res => res.json())
-        .then(data => {
-          document.getElementById("team1").textContent = data.team1;
-          document.getElementById("team2").textContent = data.team2;
-          document.getElementById("batter1").textContent = data.batter1;
-          document.getElementById("batter2").textContent = data.batter2;
-          document.getElementById("runs").textContent = data.runs;
-          document.getElementById("wickets").textContent = data.wickets;
-          document.getElementById("overs").textContent = data.overs;
-        });
+   fetch('/api/score')
+     .then(res => res.json())
+     .then(data => {
+       document.getElementById("team1").textContent = data.team1;
+       document.getElementById("team2").textContent = data.team2;
+       document.getElementById("batter1").textContent = data.batter1;
+       document.getElementById("batter2").textContent = data.batter2;
+       document.getElementById("score").textContent = `${data.runs}-${data.wickets}`;
+       document.getElementById("overs").textContent = data.overs;
+     });
     }
-
     setInterval(fetchScore, 2000);
     fetchScore();
   </script>
