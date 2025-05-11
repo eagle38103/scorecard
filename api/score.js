@@ -1,18 +1,6 @@
 // api/score.js
-let scoreData = null;
 
-export default async function handler(req, res) {
-  if (req.method === 'POST') {
-    try {
-      scoreData = req.body;
-      return res.status(200).json({ message: 'Score updated' });
-    } catch (e) {
-      return res.status(400).json({ error: 'Invalid data' });
-    }
-  } else if (req.method === 'GET') {
-    return res.status(200).json(scoreData || {});
-  } else {
-    res.setHeader('Allow', ['GET', 'POST']);
-    return res.status(405).end(`Method ${req.method} Not Allowed`);
-  }
-}
+let scoreData = { team1: "Team A", team2: "Team B", batter1: "-", batter2: "-", runs: 0, wickets: 0, overs: "0.0" };
+
+export default function handler(req, res) { if (req.method === 'GET') { res.status(200).json(scoreData); } else if (req.method === 'POST') { scoreData = { ...scoreData, ...req.body }; res.status(200).json({ message: "Score updated" }); } else { res.status(405).end(); } }
+
