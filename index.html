@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+   <meta http-equiv="refresh" content="3">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Cricket Scorecard Display</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      
+    }
+    .scorecard {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(to right, #243B55, #141E30);
+      color: white;
+      padding: 15px 20px;
+      border-radius: 10px;
+      max-width: 1000px;
+      margin: 30px auto;
+      font-size: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+    .score-section {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .highlight {
+      color: #00bfff;
+      font-weight: bold;
+      font-size: 18px;
+    }
+    .batter {
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="scorecard">
+    <div class="score-section">
+      <div class="highlight" id="team1">Team 1</div>
+      <div id="score">0-0</div>
+      <div>Overs <span id="overs">0.0</span></div>
+      <div>Target <span id="target">0</span></div>
+    </div>
+    <div class="score-section">
+      <div class="batter" id="batter1">Batter 1 0 (0)</div>
+      <div class="batter" id="batter2">Batter 2 0 (0)</div>
+    </div>
+    <div class="score-section">
+      <div class="highlight" id="team2">Team 2</div>
+    </div>
+  </div>
+
+  <script>
+    function fetchScore() {
+      fetch('/api/score')
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById("team1").textContent = data.team1;
+          document.getElementById("team2").textContent = data.team2;
+          document.getElementById("batter1").textContent = data.batter1;
+          document.getElementById("batter2").textContent = data.batter2;
+          document.getElementById("runs").textContent = data.runs;
+          document.getElementById("wickets").textContent = data.wickets;
+          document.getElementById("overs").textContent = data.overs;
+        });
+    }
+
+    setInterval(fetchScore, 2000);
+    fetchScore();
+  </script>
+</body>
+</html>
