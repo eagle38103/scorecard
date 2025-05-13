@@ -111,7 +111,6 @@
   scoreData.runs += run;
   scoreData.balls++;
 
-  // Update the correct batter's score and ball count
   if (scoreData.striker === "batter1") {
     scoreData.batter1Score += run;
     scoreData.batter1Balls++;
@@ -120,12 +119,10 @@
     scoreData.batter2Balls++;
   }
 
-  // Swap striker on odd runs
   if (run % 2 !== 0) {
     [scoreData.striker, scoreData.nonStriker] = [scoreData.nonStriker, scoreData.striker];
   }
 
-  // Check for over completion (6 legal balls)
   if (scoreData.balls >= 6) {
     scoreData.overs++;
     scoreData.balls = 0;
@@ -137,34 +134,45 @@
   updateOvers();
   saveData();
     }
-
     function updateOvers() {
-      const completedOvers = Math.floor(scoreData.balls / 6);
-      const remainingBalls = scoreData.balls % 6;
-      scoreData.overs = `${completedOvers}.${remainingBalls}`;
+  // Display overs as full overs + balls (e.g. 3.2)
+  document.getElementById('overs').textContent = `Overs: ${scoreData.overs}.${scoreData.balls}`;
     }
 
     function noBall() {
-    const runStr = prompt("How many runs were scored on the no ball (excluding the extra run)?", "0");
-    const batterRuns = parseInt(runStr) || 0;
+  const runStr = prompt("How many runs were scored on the no ball (excluding the extra run)?", "0");
+  const batterRuns = parseInt(runStr) || 0;
 
-    scoreData.runs += 1 + batterRuns; // 1 for no-ball + actual runs
-    // Add runs to striker
-    if (scoreData.striker === scoreData.batter1) {
-        scoreData.batter1Score += batterRuns;
-        scoreData.batter1Balls++;
-    } else {
-        scoreData.batter2Score += batterRuns;
-        scoreData.batter2Balls++;
-    }
+  scoreData.runs += 1 + batterRuns;
 
-    saveData();
+  if (scoreData.striker === "batter1") {
+    scoreData.batter1Score += batterRuns;
+    if (batterRuns > 0) scoreData.batter1Balls++;
+  } else {
+    scoreData.batter2Score += batterRuns;
+    if (batterRuns > 0) scoreData.batter2Balls++;
+  }
+
+  // Swap striker if batterRuns is odd
+  if (batterRuns % 2 !== 0) {
+    [scoreData.striker, scoreData.nonStriker] = [scoreData.nonStriker, scoreData.striker];
+  }
+
+  saveData();
     }
 
     function wideBall() {
-      const extras = parseInt(prompt("Wide ball! How many runs were scored (including extras)?", "1")) || 0;
-      scoreData.runs += extras;
-      saveData();
+  const extraStr = prompt("How many extra runs were scored on the wide (excluding the wide run)?", "0");
+  const extra = parseInt(extraStr) || 0;
+
+  scoreData.runs += 1 + extra;
+
+  // Swap striker if extra is odd
+  if (extra % 2 !== 0) {
+    [scoreData.striker, scoreData.nonStriker] = [scoreData.nonStriker, scoreData.striker];
+  }
+
+  saveData();
     }
 
     function wicket() {
