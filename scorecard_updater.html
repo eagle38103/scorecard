@@ -110,6 +110,7 @@
             scoreData.bowlerRuns += run;
             scoreData.bowlerBalls++;
 
+            // Update striker's score
             if (scoreData.striker === 'Batter 1') {
                 scoreData.batter1Score += run;
                 scoreData.batter1Balls++;
@@ -118,16 +119,25 @@
                 scoreData.batter2Balls++;
             }
 
-            if (scoreData.balls % 6 === 0) {
-                scoreData.overs++;
-                scoreData.balls = 0;
-            }
-
+            // Swap striker on odd runs
             if (run % 2 !== 0) {
                 [scoreData.striker, scoreData.nonStriker] = [scoreData.nonStriker, scoreData.striker];
             }
 
+            // Handle Over Completion (6 Balls)
+            if (scoreData.bowlerBalls >= 6) {
+                scoreData.overs++;
+                scoreData.balls = 0;
+                resetBowlerStats();
+            }
+
             saveData();
+        }
+
+        function resetBowlerStats() {
+            scoreData.bowlerBalls = 0;
+            scoreData.bowlerRuns = 0;
+            scoreData.bowlerWickets = 0;
         }
 
         function noBall() {
