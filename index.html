@@ -63,8 +63,9 @@
       document.getElementById("team1").textContent = data.team1;
       document.getElementById("team2").textContent = data.team2;
 
-      const batter1 = data.batter1 + (data.striker === "batter1" ? "*" : "");
-      const batter2 = data.batter2 + (data.striker === "batter2" ? "*" : "");
+      // Adding asterisk to the striker
+      const batter1 = `${data.batter1} ${data.batter1Score}` + (data.striker === "batter1" ? "*" : "");
+      const batter2 = `${data.batter2} ${data.batter2Score}` + (data.striker === "batter2" ? "*" : "");
 
       document.getElementById("batter1").textContent = batter1;
       document.getElementById("batter2").textContent = batter2;
