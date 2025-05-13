@@ -47,25 +47,16 @@
     </style>
 </head>
 <body>
-    <h1>Enhanced Cricket Scorecard Updater</h1>
+    <h1>Cricket Scorecard Updater</h1>
 
     <!-- Name Updater -->
     <div class="name-input">
-        <input type="text" id="team1Name" placeholder="Enter Team 1 Name">
-        <input type="text" id="team2Name" placeholder="Enter Team 2 Name">
-        <input type="text" id="batter1Name" placeholder="Enter Batter 1 Name">
-        <input type="text" id="batter2Name" placeholder="Enter Batter 2 Name">
+        <input type="text" id="team1Name" placeholder="Team 1 Name">
+        <input type="text" id="team2Name" placeholder="Team 2 Name">
+        <input type="text" id="batter1Name" placeholder="Batter 1 Name">
+        <input type="text" id="batter2Name" placeholder="Batter 2 Name">
+        <input type="text" id="bowlerName" placeholder="Bowler Name">
         <button onclick="updateNames()">Update Names</button>
-    </div>
-
-    <!-- Scorecard Display -->
-    <div class="scorecard">
-        <p id="team1">Team 1</p>
-        <p id="team2">Team 2</p>
-        <p id="score">Score: 0-0</p>
-        <p id="overs">Overs: 0.0</p>
-        <p id="striker">Striker: Batter 1 (0 runs, 0 balls)</p>
-        <p id="nonStriker">Non-Striker: Batter 2 (0 runs, 0 balls)</p>
     </div>
 
     <!-- Interactive Scoring -->
@@ -82,8 +73,8 @@
 
     <script>
         let runs = 0, wickets = 0, balls = 0, overs = 0.0;
-        let batter1Score = 0, batter2Score = 0, batter1Balls = 0, batter2Balls = 0;
-        let striker = 'Batter 1', nonStriker = 'Batter 2';
+        let bowlerBalls = 0, bowlerRuns = 0, bowlerWickets = 0;
+        let striker = 'Batter 1', nonStriker = 'Batter 2', bowler = 'Bowler 1';
         let team1 = 'Team 1', team2 = 'Team 2';
 
         function updateNames() {
@@ -91,47 +82,39 @@
             team2 = document.getElementById("team2Name").value || 'Team 2';
             striker = document.getElementById("batter1Name").value || 'Batter 1';
             nonStriker = document.getElementById("batter2Name").value || 'Batter 2';
-            updateDisplay();
+            bowler = document.getElementById("bowlerName").value || 'Bowler 1';
         }
 
         function updateScore(run) {
             runs += run;
+            bowlerRuns += run;
             balls++;
-            if (striker === 'Batter 1') {
-                batter1Score += run;
-                batter1Balls++;
-            } else {
-                batter2Score += run;
-                batter2Balls++;
-            }
+            bowlerBalls++;
 
             if (balls % 6 === 0) {
                 overs++;
                 balls = 0;
             }
-
-            if (run % 2 !== 0) {
-                [striker, nonStriker] = [nonStriker, striker];
-                [batter1Score, batter2Score] = [batter2Score, batter1Score];
-                [batter1Balls, batter2Balls] = [batter2Balls, batter1Balls];
-            }
-
             updateBackend();
         }
 
         function noBall() {
             runs++;
+            bowlerRuns++;
             updateBackend();
         }
 
         function wideBall() {
             runs++;
+            bowlerRuns++;
             updateBackend();
         }
 
         function wicket() {
             wickets++;
+            bowlerWickets++;
             balls++;
+            bowlerBalls++;
             updateBackend();
         }
 
@@ -144,30 +127,18 @@
                 overs: `${overs}.${balls}`,
                 batter1: striker,
                 batter2: nonStriker,
-                batter1Score: `${batter1Score} (${batter1Balls})`,
-                batter2Score: `${batter2Score} (${batter2Balls})`,
-                striker: striker === 'Batter 1' ? 'batter1' : 'batter2'
+                bowler: bowler,
+                bowlerBalls: bowlerBalls,
+                bowlerRuns: bowlerRuns,
+                bowlerWickets: bowlerWickets
             };
 
             fetch('/api/score', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
-            })
-            .then(() => updateDisplay())
-            .catch(err => alert("Failed to update score"));
+            });
         }
-
-        function updateDisplay() {
-            document.getElementById("team1").textContent = team1;
-            document.getElementById("team2").textContent = team2;
-            document.getElementById('score').textContent = `Score: ${runs}-${wickets}`;
-            document.getElementById('overs').textContent = `Overs: ${overs}.${balls}`;
-            document.getElementById('striker').textContent = `Striker: ${striker} (${batter1Score} runs, ${batter1Balls} balls)`;
-            document.getElementById('nonStriker').textContent = `Non-Striker: ${nonStriker} (${batter2Score} runs, ${batter2Balls} balls)`;
-        }
-
-        updateDisplay();
     </script>
 </body>
 </html>
