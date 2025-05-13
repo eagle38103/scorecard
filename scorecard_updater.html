@@ -1,185 +1,193 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Cricket Scorecard Updater</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #141E30;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-            padding: 20px;
-        }
-        .updater, .name-input {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        button, input {
-            padding: 10px;
-            margin: 5px;
-            background-color: #00bfff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover, input:hover {
-            background-color: #007bbf;
-        }
-        input {
-            width: 150px;
-            color: black;
-        }
-        .scorecard {
-            background: #243B55;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 10px;
-            text-align: center;
-            width: 300px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Cricket Scorecard Updater</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #141E30;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      padding: 20px;
+    }
+    .updater, .name-input {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    button, input {
+      padding: 10px;
+      margin: 5px;
+      background-color: #00bfff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover, input:hover {
+      background-color: #007bbf;
+    }
+    input {
+      width: 150px;
+      color: black;
+    }
+    .scorecard {
+      background: #243B55;
+      padding: 15px;
+      border-radius: 10px;
+      margin: 10px;
+      text-align: center;
+      width: 320px;
+    }
+  </style>
 </head>
 <body>
-    <h1>Cricket Scorecard Updater</h1>
+  <h1>Cricket Scorecard Updater</h1>
 
-    <!-- Name Updater -->
-    <div class="name-input">
-        <input type="text" id="team1Name" placeholder="Team 1 Name">
-        <input type="text" id="team2Name" placeholder="Team 2 Name">
-        <input type="text" id="batter1Name" placeholder="Batter 1 Name">
-        <input type="text" id="batter2Name" placeholder="Batter 2 Name">
-        <input type="text" id="bowlerName" placeholder="Bowler Name">
-        <button onclick="updateNames()">Update Names</button>
-        <button onclick="clearScorecard()">Clear Scorecard</button>
-    </div>
+  <div class="name-input">
+    <input type="text" id="team1Name" placeholder="Team 1 Name">
+    <input type="text" id="team2Name" placeholder="Team 2 Name">
+    <input type="text" id="batter1Name" placeholder="Batter 1 Name">
+    <input type="text" id="batter2Name" placeholder="Batter 2 Name">
+    <button onclick="updateNames()">Update Names</button>
+    <button onclick="clearScorecard()">Clear Scorecard</button>
+  </div>
 
-    <!-- Scorecard Display -->
-    <div class="scorecard">
-        <p id="score">Score: 0-0</p>
-        <p id="overs">Overs: 0.0</p>
-        <p id="striker">Striker: Batter 1 (0 runs, 0 balls)</p>
-        <p id="nonStriker">Non-Striker: Batter 2 (0 runs, 0 balls)</p>
-        <p id="bowler">Bowler: Bowler 1 0/0 (0)</p>
-    </div>
+  <div class="scorecard">
+    <p id="score">Score: 0-0</p>
+    <p id="overs">Overs: 0.0</p>
+    <p id="striker">Striker: Batter 1 0 (0)</p>
+    <p id="nonStriker">Non-Striker: Batter 2 0 (0)</p>
+  </div>
 
-    <!-- Interactive Scoring -->
-    <div class="updater">
-        <button onclick="updateScore(1)">1 Run</button>
-        <button onclick="updateScore(2)">2 Runs</button>
-        <button onclick="updateScore(3)">3 Runs</button>
-        <button onclick="updateScore(4)">4 Runs</button>
-        <button onclick="updateScore(6)">6 Runs</button>
-        <button onclick="noBall()">No Ball</button>
-        <button onclick="wideBall()">Wide Ball</button>
-        <button onclick="wicket()">Wicket</button>
-    </div>
+  <div class="updater">
+    <button onclick="updateScore(1)">1 Run</button>
+    <button onclick="updateScore(2)">2 Runs</button>
+    <button onclick="updateScore(3)">3 Runs</button>
+    <button onclick="updateScore(4)">4 Runs</button>
+    <button onclick="updateScore(6)">6 Runs</button>
+    <button onclick="noBall()">No Ball</button>
+    <button onclick="wideBall()">Wide Ball</button>
+    <button onclick="wicket()">Wicket</button>
+  </div>
 
-    <script>
-        let scoreData = JSON.parse(localStorage.getItem('scoreData')) || {
-            runs: 0, wickets: 0, balls: 0, overs: 0.0,
-            batter1Score: 0, batter2Score: 0, batter1Balls: 0, batter2Balls: 0,
-            bowlerBalls: 0, bowlerRuns: 0, bowlerWickets: 0,
-            striker: 'Batter 1', nonStriker: 'Batter 2', bowler: 'Bowler 1'
-        };
+  <script>
+    let scoreData = JSON.parse(localStorage.getItem('scoreData')) || {
+      team1: "Team A",
+      team2: "Team B",
+      batter1: "Batter 1",
+      batter2: "Batter 2",
+      batter1Score: 0,
+      batter2Score: 0,
+      batter1Balls: 0,
+      batter2Balls: 0,
+      striker: "batter1",
+      runs: 0,
+      wickets: 0,
+      overs: "0.0",
+      balls: 0
+    };
 
-        function updateNames() {
-            scoreData.striker = document.getElementById("batter1Name").value || 'Batter 1';
-            scoreData.nonStriker = document.getElementById("batter2Name").value || 'Batter 2';
-            scoreData.bowler = document.getElementById("bowlerName").value || 'Bowler 1';
-            saveData();
-        }
+    function updateNames() {
+      const batter1 = document.getElementById("batter1Name").value || "Batter 1";
+      const batter2 = document.getElementById("batter2Name").value || "Batter 2";
+      const team1 = document.getElementById("team1Name").value || "Team A";
+      const team2 = document.getElementById("team2Name").value || "Team B";
 
-        function updateScore(run) {
-            scoreData.runs += run;
-            scoreData.balls++;
-            scoreData.bowlerRuns += run;
-            scoreData.bowlerBalls++;
+      scoreData.batter1 = batter1;
+      scoreData.batter2 = batter2;
+      scoreData.team1 = team1;
+      scoreData.team2 = team2;
 
-            // Update the correct batter's score and ball count
-            if (scoreData.striker === scoreData.striker) {
-                if (scoreData.striker === scoreData.batter1) {
-                    scoreData.batter1Score += run;
-                    scoreData.batter1Balls++;
-                } else {
-                    scoreData.batter2Score += run;
-                    scoreData.batter2Balls++;
-                }
-            }
+      saveData();
+    }
 
-            // Swap striker on odd runs
-            if (run % 2 !== 0) {
-                [scoreData.striker, scoreData.nonStriker] = [scoreData.nonStriker, scoreData.striker];
-            }
+    function updateScore(run) {
+      scoreData.runs += run;
+      scoreData.balls++;
 
-            // Handle Over Completion (6 Balls)
-            if (scoreData.bowlerBalls >= 6) {
-                scoreData.overs++;
-                scoreData.balls = 0;
-                resetBowlerStats();
-            }
+      if (scoreData.striker === "batter1") {
+        scoreData.batter1Score += run;
+        scoreData.batter1Balls++;
+      } else {
+        scoreData.batter2Score += run;
+        scoreData.batter2Balls++;
+      }
 
-            saveData();
-        }
+      if (run % 2 !== 0) {
+        [scoreData.striker, temp] = [scoreData.striker === "batter1" ? "batter2" : "batter1", scoreData.striker];
+      }
 
-        function resetBowlerStats() {
-            scoreData.bowlerBalls = 0;
-            scoreData.bowlerRuns = 0;
-            scoreData.bowlerWickets = 0;
-        }
+      updateOvers();
+      saveData();
+    }
 
-        function noBall() {
-            scoreData.runs++;
-            scoreData.bowlerRuns++;
-            saveData();
-        }
+    function updateOvers() {
+      const completedOvers = Math.floor(scoreData.balls / 6);
+      const remainingBalls = scoreData.balls % 6;
+      scoreData.overs = `${completedOvers}.${remainingBalls}`;
+    }
 
-        function wideBall() {
-            scoreData.runs++;
-            scoreData.bowlerRuns++;
-            saveData();
-        }
+    function noBall() {
+      const extras = parseInt(prompt("No ball! How many runs were scored (including extras)?", "1")) || 0;
+      scoreData.runs += extras;
+      saveData();
+    }
 
-        function wicket() {
-            scoreData.wickets++;
-            scoreData.bowlerWickets++;
-            saveData();
-        }
+    function wideBall() {
+      const extras = parseInt(prompt("Wide ball! How many runs were scored (including extras)?", "1")) || 0;
+      scoreData.runs += extras;
+      saveData();
+    }
 
-        function clearScorecard() {
-            localStorage.removeItem('scoreData');
-            location.reload();
-        }
+    function wicket() {
+      scoreData.wickets++;
+      scoreData.balls++;
+      updateOvers();
+      saveData();
+    }
 
-        function saveData() {
-            localStorage.setItem('scoreData', JSON.stringify(scoreData));
-            updateBackend();
-            updateDisplay();
-        }
+    function clearScorecard() {
+      localStorage.removeItem('scoreData');
+      location.reload();
+    }
 
-        function updateBackend() {
-            fetch('/api/score', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(scoreData)
-            });
-        }
+    function saveData() {
+      localStorage.setItem('scoreData', JSON.stringify(scoreData));
+      updateBackend();
+      updateDisplay();
+    }
 
-        function updateDisplay() {
-            document.getElementById('score').textContent = `Score: ${scoreData.runs}-${scoreData.wickets}`;
-            document.getElementById('overs').textContent = `Overs: ${scoreData.overs}.${scoreData.balls}`;
-            document.getElementById('striker').textContent = `Striker: ${scoreData.striker} (${scoreData.batter1Score} runs, ${scoreData.batter1Balls} balls)`;
-            document.getElementById('nonStriker').textContent = `Non-Striker: ${scoreData.nonStriker} (${scoreData.batter2Score} runs, ${scoreData.batter2Balls} balls)`;
-            document.getElementById('bowler').textContent = `Bowler: ${scoreData.bowler} ${scoreData.bowlerRuns}/${scoreData.bowlerWickets} (${scoreData.bowlerBalls})`;
-        }
+    function updateBackend() {
+      fetch('/api/score', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(scoreData)
+      });
+    }
 
-        updateDisplay();
-    </script>
+    function updateDisplay() {
+      document.getElementById('score').textContent = `Score: ${scoreData.runs}-${scoreData.wickets}`;
+      document.getElementById('overs').textContent = `Overs: ${scoreData.overs}`;
+
+      const strikerName = scoreData.striker === "batter1" ? scoreData.batter1 : scoreData.batter2;
+      const strikerRuns = scoreData.striker === "batter1" ? scoreData.batter1Score : scoreData.batter2Score;
+      const strikerBalls = scoreData.striker === "batter1" ? scoreData.batter1Balls : scoreData.batter2Balls;
+
+      const nonStrikerName = scoreData.striker === "batter1" ? scoreData.batter2 : scoreData.batter1;
+      const nonStrikerRuns = scoreData.striker === "batter1" ? scoreData.batter2Score : scoreData.batter1Score;
+      const nonStrikerBalls = scoreData.striker === "batter1" ? scoreData.batter2Balls : scoreData.batter1Balls;
+
+      document.getElementById('striker').textContent = `Striker: ${strikerName} ${strikerRuns} (${strikerBalls})`;
+      document.getElementById('nonStriker').textContent = `Non-Striker: ${nonStrikerName} ${nonStrikerRuns} (${nonStrikerBalls})`;
+    }
+
+    updateDisplay();
+  </script>
 </body>
 </html>
