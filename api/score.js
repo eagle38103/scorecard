@@ -3,7 +3,9 @@ let scoreData = {
   team2: "Team B",
   batter1: "-",
   batter2: "-",
-  striker: "batter1", // New field to indicate the current striker
+  batter1Score: "0 (0)",  // Updated to include score and balls
+  batter2Score: "0 (0)",  // Updated to include score and balls
+  striker: "batter1", 
   runs: 0,
   wickets: 0,
   overs: "0.0"
