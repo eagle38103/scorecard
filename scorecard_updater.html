@@ -14,7 +14,7 @@
             gap: 20px;
             padding: 20px;
         }
-        .updater, .name-input {
+        .updater, .name-input, .manual-input {
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
@@ -59,6 +59,15 @@
         <button onclick="updateNames()">Update Names</button>
     </div>
 
+    <!-- Manual Input for Persistent Score -->
+    <div class="manual-input">
+        <input type="number" id="manualRuns" placeholder="Total Runs">
+        <input type="number" id="manualWickets" placeholder="Total Wickets">
+        <input type="number" id="manualOvers" placeholder="Overs (0.0)">
+        <button onclick="manualUpdate()">Manual Update</button>
+        <button onclick="clearScorecard()">Clear Scorecard</button>
+    </div>
+
     <!-- Scorecard Display -->
     <div class="scorecard">
         <p id="score">Score: 0-0</p>
@@ -81,97 +90,96 @@
     </div>
 
     <script>
-        let runs = 0, wickets = 0, balls = 0, overs = 0.0;
-        let batter1Score = 0, batter2Score = 0, batter1Balls = 0, batter2Balls = 0;
-        let bowlerBalls = 0, bowlerRuns = 0, bowlerWickets = 0;
-        let striker = 'Batter 1', nonStriker = 'Batter 2', bowler = 'Bowler 1';
-        let team1 = 'Team 1', team2 = 'Team 2';
+        let scoreData = JSON.parse(localStorage.getItem('scoreData')) || {
+            runs: 0, wickets: 0, balls: 0, overs: 0.0,
+            batter1Score: 0, batter2Score: 0, batter1Balls: 0, batter2Balls: 0,
+            bowlerBalls: 0, bowlerRuns: 0, bowlerWickets: 0,
+            striker: 'Batter 1', nonStriker: 'Batter 2', bowler: 'Bowler 1'
+        };
 
         function updateNames() {
-            team1 = document.getElementById("team1Name").value || 'Team 1';
-            team2 = document.getElementById("team2Name").value || 'Team 2';
-            striker = document.getElementById("batter1Name").value || 'Batter 1';
-            nonStriker = document.getElementById("batter2Name").value || 'Batter 2';
-            bowler = document.getElementById("bowlerName").value || 'Bowler 1';
-            updateDisplay();
+            scoreData.striker = document.getElementById("batter1Name").value || 'Batter 1';
+            scoreData.nonStriker = document.getElementById("batter2Name").value || 'Batter 2';
+            scoreData.bowler = document.getElementById("bowlerName").value || 'Bowler 1';
+            saveData();
         }
 
         function updateScore(run) {
-            runs += run;
-            balls++;
-            bowlerRuns += run;
-            bowlerBalls++;
+            scoreData.runs += run;
+            scoreData.balls++;
+            scoreData.bowlerRuns += run;
+            scoreData.bowlerBalls++;
 
-            // Update striker's score
-            if (striker === 'Batter 1') {
-                batter1Score += run;
-                batter1Balls++;
+            if (scoreData.striker === 'Batter 1') {
+                scoreData.batter1Score += run;
+                scoreData.batter1Balls++;
             } else {
-                batter2Score += run;
-                batter2Balls++;
+                scoreData.batter2Score += run;
+                scoreData.batter2Balls++;
             }
 
-            if (balls % 6 === 0) {
-                overs++;
-                balls = 0;
+            if (scoreData.balls % 6 === 0) {
+                scoreData.overs++;
+                scoreData.balls = 0;
             }
 
-            // Swap striker if the run count is odd
             if (run % 2 !== 0) {
-                [striker, nonStriker] = [nonStriker, striker];
-                [batter1Score, batter2Score] = [batter2Score, batter1Score];
-                [batter1Balls, batter2Balls] = [batter2Balls, batter1Balls];
+                [scoreData.striker, scoreData.nonStriker] = [scoreData.nonStriker, scoreData.striker];
             }
 
-            updateBackend();
+            saveData();
         }
 
         function noBall() {
-            runs++;
-            bowlerRuns++;
-            updateBackend();
+            scoreData.runs++;
+            scoreData.bowlerRuns++;
+            saveData();
         }
 
         function wideBall() {
-            runs++;
-            bowlerRuns++;
-            updateBackend();
+            scoreData.runs++;
+            scoreData.bowlerRuns++;
+            saveData();
         }
 
         function wicket() {
-            wickets++;
-            bowlerWickets++;
-            balls++;
-            bowlerBalls++;
+            scoreData.wickets++;
+            scoreData.bowlerWickets++;
+            saveData();
+        }
+
+        function clearScorecard() {
+            localStorage.removeItem('scoreData');
+            location.reload();
+        }
+
+        function manualUpdate() {
+            scoreData.runs = parseInt(document.getElementById("manualRuns").value) || scoreData.runs;
+            scoreData.wickets = parseInt(document.getElementById("manualWickets").value) || scoreData.wickets;
+            scoreData.overs = parseFloat(document.getElementById("manualOvers").value) || scoreData.overs;
+            saveData();
+        }
+
+        function saveData() {
+            localStorage.setItem('scoreData', JSON.stringify(scoreData));
             updateBackend();
+            updateDisplay();
         }
 
         function updateBackend() {
-            const data = {
-                team1, team2, runs, wickets,
-                overs: `${overs}.${balls}`,
-                batter1: striker, batter2: nonStriker,
-                batter1Score: `${batter1Score} (${batter1Balls})`,
-                batter2Score: `${batter2Score} (${batter2Balls})`,
-                bowler, bowlerBalls, bowlerRuns, bowlerWickets,
-                striker: striker === 'Batter 1' ? 'batter1' : 'batter2'
-            };
-
             fetch('/api/score', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            })
-            .then(() => updateDisplay())
-            .catch(err => alert("Failed to update score"));
+                body: JSON.stringify(scoreData)
+            });
         }
 
         function updateDisplay() {
-            document.getElementById('score').textContent = `Score: ${runs}-${wickets}`;
-            document.getElementById('overs').textContent = `Overs: ${overs}.${balls}`;
-            document.getElementById('striker').textContent = `Striker: ${striker} (${batter1Score} runs, ${batter1Balls} balls)`;
-            document.getElementById('nonStriker').textContent = `Non-Striker: ${nonStriker} (${batter2Score} runs, ${batter2Balls} balls)`;
-            document.getElementById('bowler').textContent = `Bowler: ${bowler} ${bowlerRuns}/${bowlerWickets} (${bowlerBalls})`;
+            document.getElementById('score').textContent = `Score: ${scoreData.runs}-${scoreData.wickets}`;
+            document.getElementById('overs').textContent = `Overs: ${scoreData.overs}.${scoreData.balls}`;
+            document.getElementById('striker').textContent = `Striker: ${scoreData.striker}`;
+            document.getElementById('nonStriker').textContent = `Non-Striker: ${scoreData.nonStriker}`;
+            document.getElementById('bowler').textContent = `Bowler: ${scoreData.bowler} ${scoreData.bowlerRuns}/${scoreData.bowlerWickets} (${scoreData.bowlerBalls})`;
         }
 
         updateDisplay();
