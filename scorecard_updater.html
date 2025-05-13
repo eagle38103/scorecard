@@ -14,7 +14,7 @@
             gap: 20px;
             padding: 20px;
         }
-        .updater, .name-input, .manual-input {
+        .updater, .name-input {
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
@@ -57,14 +57,6 @@
         <input type="text" id="batter2Name" placeholder="Batter 2 Name">
         <input type="text" id="bowlerName" placeholder="Bowler Name">
         <button onclick="updateNames()">Update Names</button>
-    </div>
-
-    <!-- Manual Input for Persistent Score -->
-    <div class="manual-input">
-        <input type="number" id="manualRuns" placeholder="Total Runs">
-        <input type="number" id="manualWickets" placeholder="Total Wickets">
-        <input type="number" id="manualOvers" placeholder="Overs (0.0)">
-        <button onclick="manualUpdate()">Manual Update</button>
         <button onclick="clearScorecard()">Clear Scorecard</button>
     </div>
 
@@ -110,7 +102,7 @@
             scoreData.bowlerRuns += run;
             scoreData.bowlerBalls++;
 
-            // Update striker's runs and balls
+            // Update correct batter's score
             if (scoreData.striker === 'Batter 1') {
                 scoreData.batter1Score += run;
                 scoreData.batter1Balls++;
@@ -122,11 +114,10 @@
             // Swap striker on odd runs
             if (run % 2 !== 0) {
                 [scoreData.striker, scoreData.nonStriker] = [scoreData.nonStriker, scoreData.striker];
-                [scoreData.batter1Score, scoreData.batter2Score] = [scoreData.batter2Score, scoreData.batter1Score];
-                [scoreData.batter1Balls, scoreData.batter2Balls] = [scoreData.batter2Balls, scoreData.batter1Balls];
             }
 
-            if (scoreData.balls % 6 === 0) {
+            // Handle Over Completion (6 Balls)
+            if (scoreData.bowlerBalls >= 6) {
                 scoreData.overs++;
                 scoreData.balls = 0;
                 resetBowlerStats();
@@ -141,9 +132,41 @@
             scoreData.bowlerWickets = 0;
         }
 
+        function noBall() {
+            scoreData.runs++;
+            scoreData.bowlerRuns++;
+            saveData();
+        }
+
+        function wideBall() {
+            scoreData.runs++;
+            scoreData.bowlerRuns++;
+            saveData();
+        }
+
+        function wicket() {
+            scoreData.wickets++;
+            scoreData.bowlerWickets++;
+            saveData();
+        }
+
+        function clearScorecard() {
+            localStorage.removeItem('scoreData');
+            location.reload();
+        }
+
         function saveData() {
             localStorage.setItem('scoreData', JSON.stringify(scoreData));
+            updateBackend();
             updateDisplay();
+        }
+
+        function updateBackend() {
+            fetch('/api/score', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(scoreData)
+            });
         }
 
         function updateDisplay() {
