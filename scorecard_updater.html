@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Interactive Cricket Scorecard Updater</title>
+    <title>Enhanced Cricket Scorecard Updater</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -14,22 +14,27 @@
             gap: 20px;
             padding: 20px;
         }
-        .updater {
+        .updater, .name-input {
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
             justify-content: center;
         }
-        button {
-            padding: 10px 20px;
+        button, input {
+            padding: 10px;
+            margin: 5px;
             background-color: #00bfff;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
         }
-        button:hover {
+        button:hover, input:hover {
             background-color: #007bbf;
+        }
+        input {
+            width: 150px;
+            color: black;
         }
         .scorecard {
             background: #243B55;
@@ -37,17 +42,33 @@
             border-radius: 10px;
             margin: 10px;
             text-align: center;
+            width: 300px;
         }
     </style>
 </head>
 <body>
-    <h1>Cricket Scorecard Updater</h1>
+    <h1>Enhanced Cricket Scorecard Updater</h1>
+
+    <!-- Name Updater -->
+    <div class="name-input">
+        <input type="text" id="team1Name" placeholder="Enter Team 1 Name">
+        <input type="text" id="team2Name" placeholder="Enter Team 2 Name">
+        <input type="text" id="batter1Name" placeholder="Enter Batter 1 Name">
+        <input type="text" id="batter2Name" placeholder="Enter Batter 2 Name">
+        <button onclick="updateNames()">Update Names</button>
+    </div>
+
+    <!-- Scorecard Display -->
     <div class="scorecard">
+        <p id="team1">Team 1</p>
+        <p id="team2">Team 2</p>
         <p id="score">Score: 0-0</p>
         <p id="overs">Overs: 0.0</p>
-        <p id="striker">Striker: Batter 1</p>
-        <p id="nonStriker">Non-Striker: Batter 2</p>
+        <p id="striker">Striker: Batter 1 (0 runs, 0 balls)</p>
+        <p id="nonStriker">Non-Striker: Batter 2 (0 runs, 0 balls)</p>
     </div>
+
+    <!-- Interactive Scoring -->
     <div class="updater">
         <button onclick="updateScore(1)">1 Run</button>
         <button onclick="updateScore(2)">2 Runs</button>
@@ -61,18 +82,40 @@
 
     <script>
         let runs = 0, wickets = 0, balls = 0, overs = 0.0;
+        let batter1Score = 0, batter2Score = 0, batter1Balls = 0, batter2Balls = 0;
         let striker = 'Batter 1', nonStriker = 'Batter 2';
+        let team1 = 'Team 1', team2 = 'Team 2';
+
+        function updateNames() {
+            team1 = document.getElementById("team1Name").value || 'Team 1';
+            team2 = document.getElementById("team2Name").value || 'Team 2';
+            striker = document.getElementById("batter1Name").value || 'Batter 1';
+            nonStriker = document.getElementById("batter2Name").value || 'Batter 2';
+            updateDisplay();
+        }
 
         function updateScore(run) {
             runs += run;
             balls++;
+            if (striker === 'Batter 1') {
+                batter1Score += run;
+                batter1Balls++;
+            } else {
+                batter2Score += run;
+                batter2Balls++;
+            }
+
             if (balls % 6 === 0) {
                 overs++;
                 balls = 0;
             }
+
             if (run % 2 !== 0) {
                 [striker, nonStriker] = [nonStriker, striker];
+                [batter1Score, batter2Score] = [batter2Score, batter1Score];
+                [batter1Balls, batter2Balls] = [batter2Balls, batter1Balls];
             }
+
             updateBackend();
         }
 
@@ -94,11 +137,15 @@
 
         function updateBackend() {
             const data = {
+                team1: team1,
+                team2: team2,
                 runs: runs,
                 wickets: wickets,
                 overs: `${overs}.${balls}`,
                 batter1: striker,
                 batter2: nonStriker,
+                batter1Score: `${batter1Score} (${batter1Balls})`,
+                batter2Score: `${batter2Score} (${batter2Balls})`,
                 striker: striker === 'Batter 1' ? 'batter1' : 'batter2'
             };
 
@@ -112,10 +159,12 @@
         }
 
         function updateDisplay() {
+            document.getElementById("team1").textContent = team1;
+            document.getElementById("team2").textContent = team2;
             document.getElementById('score').textContent = `Score: ${runs}-${wickets}`;
             document.getElementById('overs').textContent = `Overs: ${overs}.${balls}`;
-            document.getElementById('striker').textContent = `Striker: ${striker}`;
-            document.getElementById('nonStriker').textContent = `Non-Striker: ${nonStriker}`;
+            document.getElementById('striker').textContent = `Striker: ${striker} (${batter1Score} runs, ${batter1Balls} balls)`;
+            document.getElementById('nonStriker').textContent = `Non-Striker: ${nonStriker} (${batter2Score} runs, ${batter2Balls} balls)`;
         }
 
         updateDisplay();
