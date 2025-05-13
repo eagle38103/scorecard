@@ -57,26 +57,7 @@
     <button onclick="saveData()">Save and Update Display</button>
   </div>
 
-     <script>
-    function saveData() {
-      const data = {
-        team1: document.getElementById("team1").value,
-        team2: document.getElementById("team2").value,
-        batter1: document.getElementById("batter1").value,
-        batter2: document.getElementById("batter2").value,
-        runs: parseInt(document.getElementById("runs").value),
-        wickets: parseInt(document.getElementById("wickets").value),
-        overs: document.getElementById("overs").value
-      };
-
-      fetch('/api/score', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      })
-      .then(() => alert("Score updated!"))
-      .catch(err => alert("Failed to update score"));
-    }
+    
       <script>
     function saveData() {
   const targetValue = document.getElementById("target").value.trim();
