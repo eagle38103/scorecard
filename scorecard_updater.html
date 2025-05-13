@@ -203,7 +203,7 @@
 
     function updateDisplay() {
       document.getElementById('score').textContent = `Score: ${scoreData.runs}-${scoreData.wickets}`;
-      document.getElementById('overs').textContent = `Overs: ${scoreData.overs}`;
+       document.getElementById('overs').textContent = `Overs: ${scoreData.overs}.${scoreData.balls}`;
 
       const strikerName = scoreData.striker === "batter1" ? scoreData.batter1 : scoreData.batter2;
       const strikerRuns = scoreData.striker === "batter1" ? scoreData.batter1Score : scoreData.batter2Score;
