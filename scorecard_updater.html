@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Enhanced Cricket Scorecard Updater</title>
+    <title>Cricket Scorecard Updater</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -59,6 +59,15 @@
         <button onclick="updateNames()">Update Names</button>
     </div>
 
+    <!-- Scorecard Display -->
+    <div class="scorecard">
+        <p id="score">Score: 0-0</p>
+        <p id="overs">Overs: 0.0</p>
+        <p id="striker">Striker: Batter 1 (0 runs, 0 balls)</p>
+        <p id="nonStriker">Non-Striker: Batter 2 (0 runs, 0 balls)</p>
+        <p id="bowler">Bowler: Bowler 1 0/0 (0)</p>
+    </div>
+
     <!-- Interactive Scoring -->
     <div class="updater">
         <button onclick="updateScore(1)">1 Run</button>
@@ -73,6 +82,7 @@
 
     <script>
         let runs = 0, wickets = 0, balls = 0, overs = 0.0;
+        let batter1Score = 0, batter2Score = 0, batter1Balls = 0, batter2Balls = 0;
         let bowlerBalls = 0, bowlerRuns = 0, bowlerWickets = 0;
         let striker = 'Batter 1', nonStriker = 'Batter 2', bowler = 'Bowler 1';
         let team1 = 'Team 1', team2 = 'Team 2';
@@ -83,18 +93,36 @@
             striker = document.getElementById("batter1Name").value || 'Batter 1';
             nonStriker = document.getElementById("batter2Name").value || 'Batter 2';
             bowler = document.getElementById("bowlerName").value || 'Bowler 1';
+            updateDisplay();
         }
 
         function updateScore(run) {
             runs += run;
-            bowlerRuns += run;
             balls++;
+            bowlerRuns += run;
             bowlerBalls++;
+
+            // Update striker's score
+            if (striker === 'Batter 1') {
+                batter1Score += run;
+                batter1Balls++;
+            } else {
+                batter2Score += run;
+                batter2Balls++;
+            }
 
             if (balls % 6 === 0) {
                 overs++;
                 balls = 0;
             }
+
+            // Swap striker if the run count is odd
+            if (run % 2 !== 0) {
+                [striker, nonStriker] = [nonStriker, striker];
+                [batter1Score, batter2Score] = [batter2Score, batter1Score];
+                [batter1Balls, batter2Balls] = [batter2Balls, batter1Balls];
+            }
+
             updateBackend();
         }
 
@@ -120,25 +148,33 @@
 
         function updateBackend() {
             const data = {
-                team1: team1,
-                team2: team2,
-                runs: runs,
-                wickets: wickets,
+                team1, team2, runs, wickets,
                 overs: `${overs}.${balls}`,
-                batter1: striker,
-                batter2: nonStriker,
-                bowler: bowler,
-                bowlerBalls: bowlerBalls,
-                bowlerRuns: bowlerRuns,
-                bowlerWickets: bowlerWickets
+                batter1: striker, batter2: nonStriker,
+                batter1Score: `${batter1Score} (${batter1Balls})`,
+                batter2Score: `${batter2Score} (${batter2Balls})`,
+                bowler, bowlerBalls, bowlerRuns, bowlerWickets,
+                striker: striker === 'Batter 1' ? 'batter1' : 'batter2'
             };
 
             fetch('/api/score', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
-            });
+            })
+            .then(() => updateDisplay())
+            .catch(err => alert("Failed to update score"));
         }
+
+        function updateDisplay() {
+            document.getElementById('score').textContent = `Score: ${runs}-${wickets}`;
+            document.getElementById('overs').textContent = `Overs: ${overs}.${balls}`;
+            document.getElementById('striker').textContent = `Striker: ${striker} (${batter1Score} runs, ${batter1Balls} balls)`;
+            document.getElementById('nonStriker').textContent = `Non-Striker: ${nonStriker} (${batter2Score} runs, ${batter2Balls} balls)`;
+            document.getElementById('bowler').textContent = `Bowler: ${bowler} ${bowlerRuns}/${bowlerWickets} (${bowlerBalls})`;
+        }
+
+        updateDisplay();
     </script>
 </body>
 </html>
