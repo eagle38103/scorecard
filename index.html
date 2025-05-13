@@ -2,13 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-   
+  <meta http-equiv="refresh" content="3">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Live Cricket Scorecard Display</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      
+      background: #141E30;
+      color: white;
+      padding: 20px;
     }
     .scorecard {
       display: flex;
@@ -36,6 +38,16 @@
     .batter {
       font-weight: bold;
     }
+    /* Updated Bowler Styling */
+    .bowler {
+      font-weight: bold;
+      font-size: 17px;
+      color: #ffcc00;
+      background: #333;
+      padding: 5px 10px;
+      border-radius: 8px;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+    }
   </style>
 </head>
 <body>
@@ -43,12 +55,15 @@
     <div class="score-section">
       <div class="highlight" id="team1">Team 1</div>
       <div id="score">0-0</div>
-      <div>Overs <span id="overs">0.0</span></div>
-      <div>Target <span id="target">0</span></div>
+      <div>Overs: <span id="overs">0.0</span></div>
     </div>
     <div class="score-section">
       <div class="batter" id="batter1">Batter 1 0 (0)</div>
       <div class="batter" id="batter2">Batter 2 0 (0)</div>
+    </div>
+    <div class="score-section">
+      <!-- Updated Bowler Area -->
+      <div class="bowler" id="bowler">Bowler 1 0/0 (0)</div>
     </div>
     <div class="score-section">
       <div class="highlight" id="team2">Team 2</div>
@@ -57,27 +72,30 @@
 
   <script>
     function fetchScore() {
-  fetch('/api/score')
-    .then(res => res.json())
-    .then(data => {
-      document.getElementById("team1").textContent = data.team1;
-      document.getElementById("team2").textContent = data.team2;
+      fetch('/api/score')
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById("team1").textContent = data.team1;
+          document.getElementById("team2").textContent = data.team2;
 
-      // Adding asterisk to the striker
-      const batter1 = `${data.batter1} ${data.batter1Score}` + (data.striker === "batter1" ? "*" : "");
-      const batter2 = `${data.batter2} ${data.batter2Score}` + (data.striker === "batter2" ? "*" : "");
+          // Adding asterisk to the striker
+          const batter1 = `${data.batter1} ${data.batter1Score}` + (data.striker === "batter1" ? "*" : "");
+          const batter2 = `${data.batter2} ${data.batter2Score}` + (data.striker === "batter2" ? "*" : "");
 
-      document.getElementById("batter1").textContent = batter1;
-      document.getElementById("batter2").textContent = batter2;
+          document.getElementById("batter1").textContent = batter1;
+          document.getElementById("batter2").textContent = batter2;
 
-      document.getElementById("score").textContent = `${data.runs}-${data.wickets}`;
-      document.getElementById("overs").textContent = data.overs;
-      document.getElementById("target").textContent = data.target; // Displaying target
-    });
-}
+          document.getElementById("score").textContent = `${data.runs}-${data.wickets}`;
+          document.getElementById("overs").textContent = data.overs;
 
-setInterval(fetchScore, 2000);
-fetchScore();
+          // Enhanced Bowler Info
+          const bowlerInfo = `${data.bowler} ${data.bowlerRuns}/${data.bowlerWickets} (${data.bowlerBalls})`;
+          document.getElementById("bowler").textContent = `Bowler: ${bowlerInfo}`;
+        });
+    }
+
+    setInterval(fetchScore, 2000);
+    fetchScore();
   </script>
 </body>
 </html>
