@@ -110,7 +110,7 @@
             scoreData.bowlerRuns += run;
             scoreData.bowlerBalls++;
 
-            // Update striker's score
+            // Update striker's runs and balls
             if (scoreData.striker === 'Batter 1') {
                 scoreData.batter1Score += run;
                 scoreData.batter1Balls++;
@@ -122,10 +122,11 @@
             // Swap striker on odd runs
             if (run % 2 !== 0) {
                 [scoreData.striker, scoreData.nonStriker] = [scoreData.nonStriker, scoreData.striker];
+                [scoreData.batter1Score, scoreData.batter2Score] = [scoreData.batter2Score, scoreData.batter1Score];
+                [scoreData.batter1Balls, scoreData.batter2Balls] = [scoreData.batter2Balls, scoreData.batter1Balls];
             }
 
-            // Handle Over Completion (6 Balls)
-            if (scoreData.bowlerBalls >= 6) {
+            if (scoreData.balls % 6 === 0) {
                 scoreData.overs++;
                 scoreData.balls = 0;
                 resetBowlerStats();
@@ -140,55 +141,16 @@
             scoreData.bowlerWickets = 0;
         }
 
-        function noBall() {
-            scoreData.runs++;
-            scoreData.bowlerRuns++;
-            saveData();
-        }
-
-        function wideBall() {
-            scoreData.runs++;
-            scoreData.bowlerRuns++;
-            saveData();
-        }
-
-        function wicket() {
-            scoreData.wickets++;
-            scoreData.bowlerWickets++;
-            saveData();
-        }
-
-        function clearScorecard() {
-            localStorage.removeItem('scoreData');
-            location.reload();
-        }
-
-        function manualUpdate() {
-            scoreData.runs = parseInt(document.getElementById("manualRuns").value) || scoreData.runs;
-            scoreData.wickets = parseInt(document.getElementById("manualWickets").value) || scoreData.wickets;
-            scoreData.overs = parseFloat(document.getElementById("manualOvers").value) || scoreData.overs;
-            saveData();
-        }
-
         function saveData() {
             localStorage.setItem('scoreData', JSON.stringify(scoreData));
-            updateBackend();
             updateDisplay();
-        }
-
-        function updateBackend() {
-            fetch('/api/score', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(scoreData)
-            });
         }
 
         function updateDisplay() {
             document.getElementById('score').textContent = `Score: ${scoreData.runs}-${scoreData.wickets}`;
             document.getElementById('overs').textContent = `Overs: ${scoreData.overs}.${scoreData.balls}`;
-            document.getElementById('striker').textContent = `Striker: ${scoreData.striker}`;
-            document.getElementById('nonStriker').textContent = `Non-Striker: ${scoreData.nonStriker}`;
+            document.getElementById('striker').textContent = `Striker: ${scoreData.striker} (${scoreData.batter1Score} runs, ${scoreData.batter1Balls} balls)`;
+            document.getElementById('nonStriker').textContent = `Non-Striker: ${scoreData.nonStriker} (${scoreData.batter2Score} runs, ${scoreData.batter2Balls} balls)`;
             document.getElementById('bowler').textContent = `Bowler: ${scoreData.bowler} ${scoreData.bowlerRuns}/${scoreData.bowlerWickets} (${scoreData.bowlerBalls})`;
         }
 
