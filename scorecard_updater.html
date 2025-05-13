@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Cricket Scorecard Updater</title>
   <style>
     body {
@@ -42,30 +42,29 @@
       border-radius: 10px;
       margin: 10px;
       text-align: center;
-      width: 300px;
+      width: 320px;
     }
   </style>
 </head>
 <body>
   <h1>Cricket Scorecard Updater</h1>
 
-  <!-- Name Updater -->
   <div class="name-input">
+    <input type="text" id="team1Name" placeholder="Team 1 Name">
+    <input type="text" id="team2Name" placeholder="Team 2 Name">
     <input type="text" id="batter1Name" placeholder="Batter 1 Name">
     <input type="text" id="batter2Name" placeholder="Batter 2 Name">
     <button onclick="updateNames()">Update Names</button>
     <button onclick="clearScorecard()">Clear Scorecard</button>
   </div>
 
-  <!-- Scorecard Display -->
   <div class="scorecard">
     <p id="score">Score: 0-0</p>
     <p id="overs">Overs: 0.0</p>
-    <p id="striker">Striker: Batter 1 (0 runs, 0 balls)</p>
-    <p id="nonStriker">Non-Striker: Batter 2 (0 runs, 0 balls)</p>
+    <p id="striker">Striker: Batter 1 0 (0)</p>
+    <p id="nonStriker">Non-Striker: Batter 2 0 (0)</p>
   </div>
 
-  <!-- Scoring Buttons -->
   <div class="updater">
     <button onclick="updateScore(1)">1 Run</button>
     <button onclick="updateScore(2)">2 Runs</button>
@@ -75,110 +74,112 @@
     <button onclick="noBall()">No Ball</button>
     <button onclick="wideBall()">Wide Ball</button>
     <button onclick="wicket()">Wicket</button>
-    <button onclick="undoLastAction()">Undo</button>
   </div>
 
   <script>
     let scoreData = JSON.parse(localStorage.getItem('scoreData')) || {
-      runs: 0, wickets: 0, balls: 0, overs: 0.0,
-      batter1Score: 0, batter2Score: 0, batter1Balls: 0, batter2Balls: 0,
-      striker: 'batter1', nonStriker: 'batter2',
-      batter1: 'Batter 1', batter2: 'Batter 2',
-      history: []
+      team1: "Team A",
+      team2: "Team B",
+      batter1: "Batter 1",
+      batter2: "Batter 2",
+      batter1Score: 0,
+      batter2Score: 0,
+      batter1Balls: 0,
+      batter2Balls: 0,
+      striker: "batter1",
+      runs: 0,
+      wickets: 0,
+      overs: "0.0",
+      balls: 0
     };
 
-    function saveHistory() {
-      const snapshot = JSON.parse(JSON.stringify(scoreData));
-      scoreData.history.push(snapshot);
-      if (scoreData.history.length > 50) scoreData.history.shift();
-    }
-
     function updateNames() {
-      scoreData.batter1 = document.getElementById("batter1Name").value || 'Batter 1';
-      scoreData.batter2 = document.getElementById("batter2Name").value || 'Batter 2';
+      const batter1 = document.getElementById("batter1Name").value || "Batter 1";
+      const batter2 = document.getElementById("batter2Name").value || "Batter 2";
+      const team1 = document.getElementById("team1Name").value || "Team A";
+      const team2 = document.getElementById("team2Name").value || "Team B";
+
+      scoreData.batter1 = batter1;
+      scoreData.batter2 = batter2;
+      scoreData.team1 = team1;
+      scoreData.team2 = team2;
+
       saveData();
     }
 
     function updateScore(run) {
-      saveHistory();
-      scoreData.runs += run;
-      scoreData.balls++;
+  scoreData.runs += run;
+  scoreData.balls++;
 
-      if (scoreData.striker === "batter1") {
-        scoreData.batter1Score += run;
-        scoreData.batter1Balls++;
-      } else {
-        scoreData.batter2Score += run;
-        scoreData.batter2Balls++;
-      }
+  if (scoreData.striker === "batter1") {
+    scoreData.batter1Score += run;
+    scoreData.batter1Balls++;
+  } else {
+    scoreData.batter2Score += run;
+    scoreData.batter2Balls++;
+  }
 
-      if (run % 2 !== 0) {
-        [scoreData.striker, scoreData.nonStriker] = [scoreData.nonStriker, scoreData.striker];
-      }
+  if (run % 2 !== 0) {
+    [scoreData.striker, scoreData.nonStriker] = [scoreData.nonStriker, scoreData.striker];
+  }
 
-      if (scoreData.balls === 6) {
-        scoreData.balls = 0;
-        scoreData.overs = (parseInt(scoreData.overs) + 1) + 0.0;
-        [scoreData.striker, scoreData.nonStriker] = [scoreData.nonStriker, scoreData.striker];
-      } else {
-        scoreData.overs = parseInt(scoreData.overs) + Math.floor(scoreData.balls) / 10;
-      }
+  if (scoreData.balls >= 6) {
+  scoreData.overs += 1;
+  scoreData.balls = 0;
 
-      saveData();
+  // Change striker after over
+  [scoreData.striker, scoreData.nonStriker] = [scoreData.nonStriker, scoreData.striker];
+  }
+
+  updateOvers();
+  saveData();
+    }
+    function updateOvers() {
+  const overDisplay = `${scoreData.overs}.${scoreData.balls}`;
+  document.getElementById('overs').textContent = `Overs: ${overDisplay}`;
     }
 
     function noBall() {
-      saveHistory();
-      const extraRuns = parseInt(prompt("Enter runs scored on No Ball (excluding extra):", "0")) || 0;
-      scoreData.runs += 1 + extraRuns;
+  const runStr = prompt("How many runs were scored on the no ball (excluding the extra run)?", "0");
+  const batterRuns = parseInt(runStr) || 0;
 
-      if (scoreData.striker === "batter1") {
-        scoreData.batter1Score += extraRuns;
-        scoreData.batter1Balls++;
-      } else {
-        scoreData.batter2Score += extraRuns;
-        scoreData.batter2Balls++;
-      }
+  scoreData.runs += 1 + batterRuns;
 
-      if (extraRuns % 2 !== 0) {
-        [scoreData.striker, scoreData.nonStriker] = [scoreData.nonStriker, scoreData.striker];
-      }
+  if (scoreData.striker === "batter1") {
+    scoreData.batter1Score += batterRuns;
+    if (batterRuns > 0) scoreData.batter1Balls++;
+  } else {
+    scoreData.batter2Score += batterRuns;
+    if (batterRuns > 0) scoreData.batter2Balls++;
+  }
 
-      saveData();
+  // Swap striker if batterRuns is odd
+  if (batterRuns % 2 !== 0) {
+    [scoreData.striker, scoreData.nonStriker] = [scoreData.nonStriker, scoreData.striker];
+  }
+
+  saveData();
     }
 
     function wideBall() {
-      saveHistory();
-      const extraRuns = parseInt(prompt("Enter runs scored on Wide Ball:", "0")) || 0;
-      scoreData.runs += 1 + extraRuns;
-      saveData();
+  const extraStr = prompt("How many extra runs were scored on the wide (excluding the wide run)?", "0");
+  const extra = parseInt(extraStr) || 0;
+
+  scoreData.runs += 1 + extra;
+
+  // Swap striker if extra is odd
+  if (extra % 2 !== 0) {
+    [scoreData.striker, scoreData.nonStriker] = [scoreData.nonStriker, scoreData.striker];
+  }
+
+  saveData();
     }
 
     function wicket() {
-      saveHistory();
       scoreData.wickets++;
       scoreData.balls++;
-
-      if (scoreData.balls === 6) {
-        scoreData.balls = 0;
-        scoreData.overs = (parseInt(scoreData.overs) + 1) + 0.0;
-        [scoreData.striker, scoreData.nonStriker] = [scoreData.nonStriker, scoreData.striker];
-      } else {
-        scoreData.overs = parseInt(scoreData.overs) + Math.floor(scoreData.balls) / 10;
-      }
-
+      updateOvers();
       saveData();
-    }
-
-    function undoLastAction() {
-      if (scoreData.history && scoreData.history.length > 0) {
-        const lastState = scoreData.history.pop();
-        Object.assign(scoreData, lastState);
-        saveData();
-        updateDisplay();
-      } else {
-        alert("No actions to undo.");
-      }
     }
 
     function clearScorecard() {
@@ -202,11 +203,18 @@
 
     function updateDisplay() {
       document.getElementById('score').textContent = `Score: ${scoreData.runs}-${scoreData.wickets}`;
-      document.getElementById('overs').textContent = `Overs: ${scoreData.overs.toFixed(1)}`;
-      document.getElementById('striker').textContent =
-        `Striker: ${scoreData[scoreData.striker]} (${scoreData.striker === 'batter1' ? scoreData.batter1Score : scoreData.batter2Score} runs, ${scoreData.striker === 'batter1' ? scoreData.batter1Balls : scoreData.batter2Balls} balls)`;
-      document.getElementById('nonStriker').textContent =
-        `Non-Striker: ${scoreData[scoreData.nonStriker]} (${scoreData.nonStriker === 'batter1' ? scoreData.batter1Score : scoreData.batter2Score} runs, ${scoreData.nonStriker === 'batter1' ? scoreData.batter1Balls : scoreData.batter2Balls} balls)`;
+       document.getElementById('overs').textContent = `Overs: ${scoreData.overs}.${scoreData.balls}`;
+
+      const strikerName = scoreData.striker === "batter1" ? scoreData.batter1 : scoreData.batter2;
+      const strikerRuns = scoreData.striker === "batter1" ? scoreData.batter1Score : scoreData.batter2Score;
+      const strikerBalls = scoreData.striker === "batter1" ? scoreData.batter1Balls : scoreData.batter2Balls;
+
+      const nonStrikerName = scoreData.striker === "batter1" ? scoreData.batter2 : scoreData.batter1;
+      const nonStrikerRuns = scoreData.striker === "batter1" ? scoreData.batter2Score : scoreData.batter1Score;
+      const nonStrikerBalls = scoreData.striker === "batter1" ? scoreData.batter2Balls : scoreData.batter1Balls;
+
+      document.getElementById('striker').textContent = `Striker: ${strikerName} ${strikerRuns} (${strikerBalls})`;
+      document.getElementById('nonStriker').textContent = `Non-Striker: ${nonStrikerName} ${nonStrikerRuns} (${nonStrikerBalls})`;
     }
 
     updateDisplay();
