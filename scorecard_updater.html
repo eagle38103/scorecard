@@ -124,11 +124,11 @@
   }
 
   if (scoreData.balls >= 6) {
-    scoreData.overs++;
-    scoreData.balls = 0;
+  scoreData.overs += 1;
+  scoreData.balls = 0;
 
-    // Change striker after over
-    [scoreData.striker, scoreData.nonStriker] = [scoreData.nonStriker, scoreData.striker];
+  // Change striker after over
+  [scoreData.striker, scoreData.nonStriker] = [scoreData.nonStriker, scoreData.striker];
   }
 
   updateOvers();
