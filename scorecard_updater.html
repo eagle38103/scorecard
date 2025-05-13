@@ -79,24 +79,31 @@
     }
       <script>
     function saveData() {
-      const data = {
-        team1: document.getElementById("team1").value,
-        team2: document.getElementById("team2").value,
-        batter1: document.getElementById("batter1").value,
-        batter2: document.getElementById("batter2").value,
-        runs: parseInt(document.getElementById("runs").value),
-        wickets: parseInt(document.getElementById("wickets").value),
-        overs: document.getElementById("overs").value
-      };
+  const targetValue = document.getElementById("target").value.trim();
+  const target = targetValue === "" ? 0 : parseInt(targetValue);
 
-      fetch('/api/score', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      })
-      .then(() => alert("Score updated!"))
-      .catch(err => alert("Failed to update score"));
-    }
+  const data = {
+    team1: document.getElementById("team1").value,
+    team2: document.getElementById("team2").value,
+    batter1: document.getElementById("batter1Name").value,
+    batter2: document.getElementById("batter2Name").value,
+    batter1Score: document.getElementById("batter1Score").value,
+    batter2Score: document.getElementById("batter2Score").value,
+    runs: parseInt(document.getElementById("score").value.split('-')[0]) || 0,
+    wickets: parseInt(document.getElementById("score").value.split('-')[1]) || 0,
+    overs: document.getElementById("overs").value,
+    target: isNaN(target) ? 0 : target,  // Ensure the target is a number
+    striker: document.getElementById("striker").value
+  };
+
+  fetch('/api/score', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  })
+  .then(() => alert("Score updated!"))
+  .catch(err => alert("Failed to update score"));
+}
   </script>
 </body>
 </html>
