@@ -135,8 +135,8 @@
   saveData();
     }
     function updateOvers() {
-  // Display overs as full overs + balls (e.g. 3.2)
-  document.getElementById('overs').textContent = `Overs: ${scoreData.overs}.${scoreData.balls}`;
+  const overDisplay = `${scoreData.overs}.${scoreData.balls}`;
+  document.getElementById('overs').textContent = `Overs: ${overDisplay}`;
     }
 
     function noBall() {
