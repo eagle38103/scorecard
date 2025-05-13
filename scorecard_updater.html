@@ -64,10 +64,13 @@
     team2: document.getElementById("team2").value,
     batter1: document.getElementById("batter1Name").value,
     batter2: document.getElementById("batter2Name").value,
+    batter1Score: document.getElementById("batter1Score").value,
+    batter2Score: document.getElementById("batter2Score").value,
     runs: parseInt(document.getElementById("score").value.split('-')[0]),
     wickets: parseInt(document.getElementById("score").value.split('-')[1]),
     overs: document.getElementById("overs").value,
-    striker: document.getElementById("striker").value // Send striker info
+    target: parseInt(document.getElementById("target").value), // Including target
+    striker: document.getElementById("striker").value 
   };
 
   fetch('/api/score', {
