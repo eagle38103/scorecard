@@ -177,10 +177,39 @@
     }
 
     function wicket() {
-      scoreData.wickets++;
-      scoreData.balls++;
-      updateOvers();
-      saveData();
+  const outPlayer = confirm("Was the striker out? Click 'OK' for Striker, 'Cancel' for Non-Striker");
+
+  scoreData.wickets++;
+
+  if (outPlayer) {
+    // Striker out
+    if (scoreData.striker === "batter1") {
+      scoreData.batter1Score = 0;
+      scoreData.batter1Balls = 0;
+      const newName = prompt("Enter name for new batter:");
+      if (newName) scoreData.batter1 = newName;
+    } else {
+      scoreData.batter2Score = 0;
+      scoreData.batter2Balls = 0;
+      const newName = prompt("Enter name for new batter:");
+      if (newName) scoreData.batter2 = newName;
+    }
+  } else {
+    // Non-striker out
+    if (scoreData.striker === "batter1") {
+      scoreData.batter2Score = 0;
+      scoreData.batter2Balls = 0;
+      const newName = prompt("Enter name for new batter:");
+      if (newName) scoreData.batter2 = newName;
+    } else {
+      scoreData.batter1Score = 0;
+      scoreData.batter1Balls = 0;
+      const newName = prompt("Enter name for new batter:");
+      if (newName) scoreData.batter1 = newName;
+    }
+  }
+
+  saveData();
     }
 
     function clearScorecard() {
