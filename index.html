@@ -34,7 +34,7 @@
       font-weight: bold;
       font-size: 18px;
     }
-    .batter, .bowler {
+    .batter {
       font-weight: bold;
     }
   </style>
@@ -51,10 +51,6 @@
       <div class="batter" id="batter2">Batter 2 0 (0)</div>
     </div>
     <div class="score-section">
-      <!-- Compact Bowler Info -->
-      <div class="bowler" id="bowler">Bowler: Bowler 1 0/0 (0)</div>
-    </div>
-    <div class="score-section">
       <div class="highlight" id="team2">Team 2</div>
     </div>
   </div>
@@ -67,20 +63,14 @@
           document.getElementById("team1").textContent = data.team1;
           document.getElementById("team2").textContent = data.team2;
 
-          // Adding asterisk to the striker
-          const batter1 = `${data.batter1} ${data.batter1Score}` + (data.striker === "batter1" ? "*" : "");
-          const batter2 = `${data.batter2} ${data.batter2Score}` + (data.striker === "batter2" ? "*" : "");
+          const batter1Display = `${data.batter1} ${data.batter1Score} (${data.batter1Balls})` + (data.striker === "batter1" ? "*" : "");
+          const batter2Display = `${data.batter2} ${data.batter2Score} (${data.batter2Balls})` + (data.striker === "batter2" ? "*" : "");
 
-          // Correctly display batter names and scores
-          document.getElementById("batter1").textContent = `${data.batter1} ${data.batter1Score}`;
-          document.getElementById("batter2").textContent = `${data.batter2} ${data.batter2Score}`;
+          document.getElementById("batter1").textContent = batter1Display;
+          document.getElementById("batter2").textContent = batter2Display;
 
           document.getElementById("score").textContent = `${data.runs}-${data.wickets}`;
           document.getElementById("overs").textContent = data.overs;
-
-          // Compact Bowler Info: Bowler: Name Runs/Wickets (Balls)
-          const bowlerInfo = `${data.bowler} ${data.bowlerRuns}/${data.bowlerWickets} (${data.bowlerBalls})`;
-          document.getElementById("bowler").textContent = `Bowler: ${bowlerInfo}`;
         });
     }
 
