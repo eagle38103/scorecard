@@ -3,12 +3,13 @@ let scoreData = {
   team2: "Team B",
   batter1: "-",
   batter2: "-",
-  batter1Score: "0 (0)",  // Updated to include score and balls
-  batter2Score: "0 (0)",  // Updated to include score and balls
-  striker: "batter1", 
+  batter1Score: "0 (0)", 
+  batter2Score: "0 (0)", 
+  striker: "batter1",
   runs: 0,
   wickets: 0,
-  overs: "0.0"
+  overs: "0.0",
+  target: 0 // New field for the target score
 };
 
 export default function handler(req, res) {
