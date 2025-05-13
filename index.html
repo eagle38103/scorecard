@@ -2,13 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Live Cricket Scorecard Display</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      
+      background: #141E30;
+      color: white;
+      padding: 20px;
     }
     .scorecard {
       display: flex;
@@ -33,18 +34,8 @@
       font-weight: bold;
       font-size: 18px;
     }
-    .batter {
+    .batter, .bowler {
       font-weight: bold;
-    }
-    /* Updated Bowler Styling */
-    .bowler {
-      font-weight: bold;
-      font-size: 17px;
-      color: #ffcc00;
-      background: #333;
-      padding: 5px 10px;
-      border-radius: 8px;
-      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
     }
   </style>
 </head>
@@ -60,8 +51,8 @@
       <div class="batter" id="batter2">Batter 2 0 (0)</div>
     </div>
     <div class="score-section">
-      <!-- Updated Bowler Area -->
-      <div class="bowler" id="bowler">Bowler 1 0/0 (0)</div>
+      <!-- Compact Bowler Info -->
+      <div class="bowler" id="bowler">Bowler: Bowler 1 0/0 (0)</div>
     </div>
     <div class="score-section">
       <div class="highlight" id="team2">Team 2</div>
@@ -80,13 +71,14 @@
           const batter1 = `${data.batter1} ${data.batter1Score}` + (data.striker === "batter1" ? "*" : "");
           const batter2 = `${data.batter2} ${data.batter2Score}` + (data.striker === "batter2" ? "*" : "");
 
-          document.getElementById("batter1").textContent = batter1;
-          document.getElementById("batter2").textContent = batter2;
+          // Correctly display batter names and scores
+          document.getElementById("batter1").textContent = `${data.batter1} ${data.batter1Score}`;
+          document.getElementById("batter2").textContent = `${data.batter2} ${data.batter2Score}`;
 
           document.getElementById("score").textContent = `${data.runs}-${data.wickets}`;
           document.getElementById("overs").textContent = data.overs;
 
-          // Enhanced Bowler Info
+          // Compact Bowler Info: Bowler: Name Runs/Wickets (Balls)
           const bowlerInfo = `${data.bowler} ${data.bowlerRuns}/${data.bowlerWickets} (${data.bowlerBalls})`;
           document.getElementById("bowler").textContent = `Bowler: ${bowlerInfo}`;
         });
